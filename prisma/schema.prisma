@@ -1,20 +1,23 @@
+// Define a fonte de dados para o banco de dados PostgreSQL, usando a variável de ambiente `DATABASE_URL` para a URL de conexão
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"  // Tipo de banco de dados utilizado
+  url      = env("DATABASE_URL")  // URL de conexão definida na variável de ambiente
 }
 
+// Configura o gerador do cliente Prisma, que é usado para interagir com o banco de dados
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js"  // Tipo de gerador que cria o cliente Prisma para JavaScript/TypeScript
 }
 
+// Define o modelo `Measure`, que representa a tabela `Measure` no banco de dados
 model Measure {
-  id              Int      @id @default(autoincrement())
-  customerCode    String
-  measureDatetime DateTime
-  measureType     String
-  measureValue    Int?
-  imageUrl        String
-  measureUuid     String   @unique
-  confirmedValue  Int?
-  isConfirmed     Boolean  @default(false)
+  id              Int      @id @default(autoincrement())  // Identificador único da medida, gerado automaticamente
+  customerCode    String  // Código do cliente
+  measureDatetime DateTime  // Data e hora da medida
+  measureType     String  // Tipo da medida
+  measureValue    Int?    // Valor da medida (opcional)
+  imageUrl        String  // URL da imagem associada à medida
+  measureUuid     String  @unique  // UUID da medida, deve ser único na tabela
+  confirmedValue  Int?    // Valor confirmado da medida (opcional)
+  isConfirmed     Boolean @default(false)  // Indica se a medida foi confirmada (default é falso)
 }

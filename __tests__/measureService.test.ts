@@ -1,17 +1,15 @@
+import prismaMock from '../__mocks__/prisma';
 import { createMeasure } from '../src/services/measureService';
 import { extractMeasureFromImage } from '../src/services/geminiService';
-import prismaMock from '../__mocks__/prisma';
 import { jest } from '@jest/globals';
 import { describe, it, expect, afterEach } from '@jest/globals';
 
-// Defina o tipo para o retorno do extractMeasureFromImage
 interface MeasureData {
   image_url: string;
   measure_uuid: string;
   measure_value: number;
 }
 
-// Ajuste o mock da função para usar a assinatura correta
 jest.mock('../src/services/geminiService', () => ({
   extractMeasureFromImage: jest.fn() as jest.MockedFunction<(base64Image: string) => Promise<MeasureData>>,
 }));
@@ -50,7 +48,6 @@ describe('createMeasure', () => {
   });
 
   it('deve criar uma medida com sucesso', async () => {
-    // Ajuste o retorno do mock para corresponder ao tipo definido
     (extractMeasureFromImage as jest.MockedFunction<typeof extractMeasureFromImage>).mockResolvedValueOnce({
       image_url: 'http://example.com/image.jpg',
       measure_uuid: 'uuid-1234',

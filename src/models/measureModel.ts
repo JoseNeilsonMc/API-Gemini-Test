@@ -1,15 +1,22 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Measure } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 // Cria uma nova leitura no banco de dados
-export const createReading = async (customerCode: string, measureDatetime: Date, measureType: string, measureValue: number, imageUrl: string, measureUuid: string) => {
+export const createReading = async (
+  customerCode: string,
+  measureDatetime: Date,
+  measureType: string,
+  measureValue: number,
+  imageUrl: string,
+  measureUuid: string
+): Promise<Measure> => {
   try {
     return await prisma.measure.create({
       data: {
         customerCode,
         measureDatetime,
-        measureType: measureType.toUpperCase(), 
+        measureType: measureType.toUpperCase(),
         measureValue,
         imageUrl,
         measureUuid
@@ -22,12 +29,16 @@ export const createReading = async (customerCode: string, measureDatetime: Date,
 };
 
 // Busca uma leitura por mês para evitar duplicação
-export const findReadingByMonth = async (customerCode: string, measureType: string, measureDatetime: Date) => {
+export const findReadingByMonth = async (
+  customerCode: string,
+  measureType: string,
+  measureDatetime: Date
+): Promise<Measure | null> => {
   try {
     return await prisma.measure.findFirst({
       where: {
         customerCode,
-        measureType: measureType.toUpperCase(), 
+        measureType: measureType.toUpperCase(),
         measureDatetime: {
           gte: new Date(measureDatetime.getFullYear(), measureDatetime.getMonth(), 1),
           lt: new Date(measureDatetime.getFullYear(), measureDatetime.getMonth() + 1, 1)
@@ -41,7 +52,9 @@ export const findReadingByMonth = async (customerCode: string, measureType: stri
 };
 
 // Busca uma leitura por UUID
-export const findReadingByUuid = async (measureUuid: string) => {
+export const findReadingByUuid = async (
+  measureUuid: string
+): Promise<Measure | null> => {
   try {
     return await prisma.measure.findUnique({
       where: { measureUuid }
@@ -53,7 +66,10 @@ export const findReadingByUuid = async (measureUuid: string) => {
 };
 
 // Atualiza uma leitura existente com o valor confirmado e marca como confirmada
-export const updateReading = async (measureUuid: string, confirmedValue: number) => {
+export const updateReading = async (
+  measureUuid: string,
+  confirmedValue: number
+): Promise<Measure> => {
   try {
     return await prisma.measure.update({
       where: { measureUuid },
@@ -69,7 +85,10 @@ export const updateReading = async (measureUuid: string, confirmedValue: number)
 };
 
 // Lista leituras por código do cliente e opcionalmente por tipo de medição
-export const findReadingsByCustomerCode = async (customerCode: string, measureType?: string) => {
+export const findReadingsByCustomerCode = async (
+  customerCode: string,
+  measureType?: string
+): Promise<Measure[]> => {
   try {
     return await prisma.measure.findMany({
       where: {

@@ -1,12 +1,14 @@
 import axios, { AxiosError } from 'axios';
 import { extractMeasureFromImage, GeminiResponse } from '../src/services/geminiService';
-import { mockAxios, isAxiosError } from '../__mocks__/axios'
-import { jest } from '@jest/globals';
+import mockAxios, { isAxiosError } from '../__mocks__/axios';
 import { describe, it, expect, afterEach } from '@jest/globals';
+import { jest } from '@jest/globals';
+
+// Cria um mock para o módulo `axios`
+jest.mock('axios');
 
 // Tipar o mock do axios
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = mockAxios as jest.Mocked<typeof axios>;
 
 describe('extractMeasureFromImage', () => {
   afterEach(() => {
