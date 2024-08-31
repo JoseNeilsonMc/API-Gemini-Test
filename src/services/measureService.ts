@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { extractMeasureFromImage } from './geminiService';
-import { AxiosError } from 'axios';  // Importe o AxiosError do axios
+import { AxiosError } from 'axios';  
 
 interface MeasureData {
   image: string;

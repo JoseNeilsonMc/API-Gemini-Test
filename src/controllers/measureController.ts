@@ -17,7 +17,7 @@ export const uploadMeasure = async (req: Request, res: Response) => {
       measure_uuid: measure.measureUuid
     });
   } catch (error: any) {
-    console.error('Erro ao criar a medida:', error); // Log do erro
+    console.error('Erro ao criar a medida:', error);
     if (error.message === 'INVALID_DATA') {
       res.status(400).json({ error_code: 'INVALID_DATA', error_description: 'Invalid data provided' });
     } else if (error.message === 'DOUBLE_REPORT') {
@@ -46,7 +46,7 @@ export const confirmMeasure = async (req: Request, res: Response) => {
     }
     res.status(200).json({ success: true });
   } catch (error: any) {
-    console.error('Erro ao confirmar a medida:', error); // Log do erro
+    console.error('Erro ao confirmar a medida:', error); 
     res.status(500).json({ error_code: 'INTERNAL_ERROR', error_description: 'Internal server error' });
   }
 };
@@ -73,7 +73,7 @@ export const listMeasures = async (req: Request, res: Response) => {
       measures
     });
   } catch (error: any) {
-    console.error('Erro ao listar as medidas:', error); // Log do erro
+    console.error('Erro ao listar as medidas:', error); 
     res.status(500).json({ error_code: 'INTERNAL_ERROR', error_description: 'Internal server error' });
   }
 };

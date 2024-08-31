@@ -27,7 +27,7 @@ export const findReadingByMonth = async (customerCode: string, measureType: stri
     return await prisma.measure.findFirst({
       where: {
         customerCode,
-        measureType: measureType.toUpperCase(), // Normalização do tipo
+        measureType: measureType.toUpperCase(), 
         measureDatetime: {
           gte: new Date(measureDatetime.getFullYear(), measureDatetime.getMonth(), 1),
           lt: new Date(measureDatetime.getFullYear(), measureDatetime.getMonth() + 1, 1)
