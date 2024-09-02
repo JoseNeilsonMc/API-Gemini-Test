@@ -9,8 +9,8 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node", "jest"] 
+    "types": ["node", "jest"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "__tests__/**/*.ts", "__tests__", "jest.setup.ts"],
   "exclude": ["node_modules", "dist"]
 }

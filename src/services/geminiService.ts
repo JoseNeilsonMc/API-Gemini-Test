@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 // Obtém a chave da API do ambiente
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;

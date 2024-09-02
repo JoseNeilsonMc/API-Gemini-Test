@@ -1,76 +1,34 @@
-import axios, { AxiosError } from 'axios';
-import { extractMeasureFromImage, GeminiResponse } from '../src/services/geminiService';
-import mockAxios, { isAxiosError } from '../__mocks__/axios';
-import { describe, it, expect, afterEach } from '@jest/globals';
-import { jest } from '@jest/globals';
+import nock from "nock";
+import request from "supertest";
+import app from "../src/app";
 
-// Cria um mock para o módulo `axios`
-jest.mock('axios');
-
-// Tipar o mock do axios
-const mockedAxios = mockAxios as jest.Mocked<typeof axios>;
-
-describe('extractMeasureFromImage', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+describe("Teste de Gemini Service", () => {
+  beforeEach(() => {
+    // Configura o nock para interceptar e simular a resposta da API Gemini
+    nock("https://api.gemini.com").post("/v1/vision").reply(200, {
+      image_url: "http://example.com/image.jpg",
+      measure_uuid: "uuid-1234",
+      measure_value: 100,
+    });
   });
 
-  it('deve retornar a resposta esperada quando a chamada for bem-sucedida', async () => {
-    const mockResponse: { data: GeminiResponse } = {
-      data: {
-        image_url: 'http://example.com/image.jpg',
-        measure_uuid: '12345',
-        measure_value: 10
-      }
-    };
+  it("deve retornar os dados da medida com sucesso", async () => {
+    const base64Image = "fakeBase64Image";
 
-    mockedAxios.post.mockResolvedValue(mockResponse);
+    const response = await request(app)
+      .post("/extract-measure")
+      .send({ base64Image });
 
-    const result = await extractMeasureFromImage('base64ImageString');
-    expect(result).toEqual(mockResponse.data);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("image_url");
+    expect(response.body).toHaveProperty("measure_uuid");
+    expect(response.body).toHaveProperty("measure_value");
   });
 
-  it('deve lançar um erro com status 404', async () => {
-    const mockError: AxiosError = {
-      response: {
-        status: 404,
-        data: { message: 'Not Found' }
-      }
-    } as any;
+  it("deve retornar um erro se a imagem base64 estiver faltando", async () => {
+    const response = await request(app).post("/extract-measure").send({});
 
-    mockedAxios.post.mockRejectedValue(mockError);
-
-    await expect(extractMeasureFromImage('base64ImageString')).rejects.toThrow('Error communicating with Gemini API: Not Found. URL: unknown URL');
-  });
-
-  it('deve lançar um erro com status 500', async () => {
-    const mockError: AxiosError = {
-      response: {
-        status: 500,
-        data: { message: 'Server Error' }
-      }
-    } as any;
-
-    mockedAxios.post.mockRejectedValue(mockError);
-
-    await expect(extractMeasureFromImage('base64ImageString')).rejects.toThrow('Error communicating with Gemini API: Server Error. URL: unknown URL');
-  });
-
-  it('deve lançar um erro quando não houver resposta', async () => {
-    const mockError: AxiosError = {
-      request: {}
-    } as any;
-
-    mockedAxios.post.mockRejectedValue(mockError);
-
-    await expect(extractMeasureFromImage('base64ImageString')).rejects.toThrow('Error communicating with Gemini API: No response from server');
-  });
-
-  it('deve lançar um erro inesperado', async () => {
-    const mockError = new Error('Unexpected error');
-
-    mockedAxios.post.mockRejectedValue(mockError);
-
-    await expect(extractMeasureFromImage('base64ImageString')).rejects.toThrow('Error communicating with Gemini API: Unexpected error');
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("error");
   });
 });

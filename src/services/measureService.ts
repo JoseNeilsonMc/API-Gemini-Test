@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { extractMeasureFromImage } from './geminiService';
-import { AxiosError } from 'axios';  
+import { AxiosError } from 'axios';
 
 // Interface para os dados da medição
 interface MeasureData {
@@ -132,7 +132,9 @@ export const listCustomerMeasures = async (customer_code: string, measure_type?:
   }
 
   // Busca as medições no banco de dados
-  return await prisma.measure.findMany({
+  const measures = await prisma.measure.findMany({
     where: whereClause
   });
+
+  return measures;
 };

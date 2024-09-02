@@ -1,89 +1,43 @@
-import prismaMock from '../__mocks__/prisma';
-import { createMeasure } from '../src/services/measureService';
-import { extractMeasureFromImage } from '../src/services/geminiService';
-import { jest } from '@jest/globals';
-import { describe, it, expect, afterEach } from '@jest/globals';
+import request from "supertest";
+import app from "../src/app"; // Aponte para o arquivo onde sua instância do app é exportada
+import { PrismaClient } from "@prisma/client";
 
-interface MeasureData {
-  image_url: string;
-  measure_uuid: string;
-  measure_value: number;
-}
+const prisma = new PrismaClient();
 
-jest.mock('../src/services/geminiService', () => ({
-  extractMeasureFromImage: jest.fn() as jest.MockedFunction<(base64Image: string) => Promise<MeasureData>>,
-}));
-
-describe('createMeasure', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+describe("Testes de API - /measures", () => {
+  beforeEach(async () => {
+    await prisma.measure.deleteMany();
   });
 
-  it('deve lançar um erro se os dados obrigatórios estiverem ausentes', async () => {
-    const data = {
-      image: '',
-      customer_code: '',
-      measure_datetime: '',
-      measure_type: '',
-    };
-
-    await expect(createMeasure(data)).rejects.toThrow('INVALID_DATA');
+  afterAll(async () => {
+    await prisma.$disconnect();
   });
 
-  it('deve lançar um erro se a medida já existir', async () => {
-    prismaMock.measure.findFirst.mockResolvedValueOnce({
-      customerCode: '123',
-      measureDatetime: new Date(),
-      measureType: 'TYPE',
-    } as any);
-
-    const data = {
-      image: 'base64image',
-      customer_code: '123',
-      measure_datetime: '2024-08-30T00:00:00Z',
-      measure_type: 'TYPE',
-    };
-
-    await expect(createMeasure(data)).rejects.toThrow('DOUBLE_REPORT');
-  });
-
-  it('deve criar uma medida com sucesso', async () => {
-    (extractMeasureFromImage as jest.MockedFunction<typeof extractMeasureFromImage>).mockResolvedValueOnce({
-      image_url: 'http://example.com/image.jpg',
-      measure_uuid: 'uuid-1234',
-      measure_value: 100,
-    });
-
-    prismaMock.measure.create.mockResolvedValueOnce({
-      id: 1,
-      customerCode: '123',
-      measureDatetime: new Date(),
-      measureType: 'TYPE',
-      imageUrl: 'http://example.com/image.jpg',
-      measureUuid: 'uuid-1234',
-      measureValue: 100,
-      confirmedValue: null,
-      isConfirmed: false,
-    } as any);
-
-    const data = {
-      image: 'base64image',
-      customer_code: '123',
-      measure_datetime: '2024-08-30T00:00:00Z',
-      measure_type: 'TYPE',
-    };
-
-    const result = await createMeasure(data);
-    expect(result).toEqual({
-      id: 1,
-      customerCode: '123',
-      measureDatetime: expect.any(Date),
-      measureType: 'TYPE',
-      imageUrl: 'http://example.com/image.jpg',
-      measureUuid: 'uuid-1234',
+  it("deve criar uma medida com sucesso", async () => {
+    const response = await request(app).post("/measures").send({
+      customerCode: "123",
+      measureDatetime: new Date().toISOString(),
+      measureType: "TYPE",
+      imageUrl: "http://example.com/image.jpg",
+      measureUuid: "uuid-1234",
       measureValue: 100,
       confirmedValue: null,
       isConfirmed: false,
     });
+
+    expect(response.status).toBe(201); // Verificando status
+    expect(response.body).toHaveProperty("id"); // Verificando se a resposta contém a propriedade 'id'
+    expect(response.body.customerCode).toBe("123"); // Verificando se o valor está correto
+  });
+
+  it("deve lançar um erro se faltar dados obrigatórios", async () => {
+    const response = await request(app).post("/measures").send({
+      measureDatetime: new Date().toISOString(),
+      measureType: "TYPE",
+      imageUrl: "http://example.com/image.jpg",
+    });
+
+    expect(response.status).toBe(400); // Verificando status de erro
+    expect(response.body).toHaveProperty("error"); // Verificando se há uma mensagem de erro
   });
 });

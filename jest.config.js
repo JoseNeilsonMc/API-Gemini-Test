@@ -19,12 +19,4 @@ module.exports = {
   // Configura arquivos a serem carregados antes dos testes serem executados. Aqui, 'dotenv/config' é usado para carregar variáveis de ambiente.
   setupFiles: ['dotenv/config'],
 
-  // Mapeia módulos para substituir suas implementações reais por mocks durante os testes.
-  moduleNameMapper: {
-    // Mapeia o módulo '@prisma/client' para um mock localizado em '__mocks__/prisma.ts'.
-    '^@prisma/client$': '<rootDir>/__mocks__/prisma.ts',
-    
-    // Mapeia o módulo 'axios' para um mock localizado em '__mocks__/axios.ts'.
-    '^axios$': '<rootDir>/__mocks__/axios.ts',
-  }
 };
