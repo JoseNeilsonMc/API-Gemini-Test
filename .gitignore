@@ -38,7 +38,7 @@ coverage/
 *.swo
 
 # Prisma related
-*.env
+prisma/.env
 
 # Logs
 *.log
