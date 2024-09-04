@@ -6,7 +6,7 @@ services:
     build: .
     # Mapeia a porta 3000 do contêiner para a porta 3000 do host
     ports:
-      - "3000:3000"
+      - "3001:3000"
     # Monta volumes para persistência de dados e sincronização de arquivos
     volumes:
       - .:/app             # Monta o diretório atual no diretório /app do contêiner
